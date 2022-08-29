@@ -43,6 +43,7 @@ class Todo {
     this.todoStatus = todoStatus;
     this.color = color;
     date = dateFormate(date);
+    this.position = 0;
   }
 }
 
@@ -52,8 +53,8 @@ function generateId() {
 
 const dateFormate = (date) => {
   let dateFormate = new Date(date);
-  let day = dateFormate.getUTCDay;
-  let month = dateFormate.getUTCMonth;
+  let day = dateFormate.getUTCDay();
+  let month = dateFormate.getUTCMonth();
   month++;
 
   return day + month;
@@ -61,6 +62,7 @@ const dateFormate = (date) => {
 
 let arr = [1];
 let loggedInUser = 1;
+let position = 0;
 loggedInUser = localStorage.getItem("logged")
   ? localStorage.getItem("logged")
   : loggedInUser;
@@ -91,14 +93,14 @@ const addTodo = (e) => {
   // console.log(mama);
   switch (priority) {
     case "critical":
-      priority = "Critical";
+      priority = "critical";
       // priority.style.color = "red";
       break;
     case "normal":
       priority = "normal";
       break;
     case "low-priority":
-      priority = "low priority";
+      priority = "low-priority";
       break;
   }
   let todo = new Todo(
@@ -118,7 +120,6 @@ const addTodo = (e) => {
   } else {
     arr.push(todo);
   }
-  // console.log(arr);
   localStorage.setItem("todos", JSON.stringify(arr));
   renderFromLocal();
 };
@@ -171,6 +172,7 @@ window.onload = () => {
   if (todos) {
     arr = todos;
   }
+  // setPositionCard()
   renderFromLocal();
   dragTask();
 };
@@ -187,8 +189,8 @@ const renderFromLocal = () => {
 // -------------------------Todo class ------------------------
 
 function render(paraTodos) {
-  cards[0].innerHTML += `
-    <div class="container cardDrag" draggable=true>
+  cards[paraTodos.position].innerHTML += `
+    <div class="container cardDrag" draggable=true id=${paraTodos.id}>
           <div class="row">
             <div class="col-lg-12">
               <div class="card card-margin" >
@@ -245,7 +247,6 @@ function Del(id) {
   const toDel = JSON.parse(localStorage.getItem("todos"));
 
   popedArr = toDel.filter((todo) => todo.id != id);
-  console.log(popedArr);
   localStorage.setItem("todos", JSON.stringify(popedArr));
 
   cards[0].innerHTML = "";
@@ -312,10 +313,14 @@ const editTodo = (id) => {
   });
 };
 
+let cardId;
 const dragTask = () => {
   const items = document.querySelectorAll(".cardDrag");
   items.forEach((item) => {
     item.addEventListener("dragstart", () => {
+      // cardDataFromLocal = JSON.parse(localStorage.getItem("todos"))
+      // position =
+      cardId = item.id;
       drag = item;
       item.style.opacity = "1";
     });
@@ -345,6 +350,15 @@ const dragTask = () => {
         cards[index].append(drag);
         box.style.backgroundColor = "#fff";
         box.style.color = "#000";
+        let todos = JSON.parse(localStorage.getItem("todos"));
+        // console.log(todos);
+        todos = todos.filter((todo) => {
+          if (todo.id == cardId) {
+            todo.position = index;
+          }
+          return todo;
+        });
+        localStorage.setItem("todos", JSON.stringify(todos));
       });
     });
   });
@@ -364,22 +378,8 @@ form.addEventListener("submit", (e) => {
   dragTask();
 });
 
-function getFromLocal() {
-  cards[0].innerHTML = "";
-  cards[1].innerHTML = "";
-  cards[2].innerHTML = "";
-  cards[3].innerHTML = "";
-  let jsonArr = localStorage.getItem("todos");
-  let arr = JSON.parse(jsonArr);
-  todos = arr;
-  todos.forEach((todo) => {
-    render(todo);
-  });
-}
-
 function logout() {
   localStorage.removeItem("logged");
-  localStorage.removeItem("theme");
 
   setTimeout(() => {
     window.location = "./index.html";
@@ -391,8 +391,6 @@ let displayFormBtn = document.getElementById("displayFormBtn");
 let displayForm = document.getElementById("exampleModal");
 displayFormBtn.addEventListener("click", (e) => {
   displayForm.style.visibility = "visible";
-
-  console.log("clicked");
 });
 
 // -----------------------------------------------------------------
@@ -419,15 +417,9 @@ showProfile();
 // Light & Dark mode
 const chk = document.getElementById("chk");
 chk.addEventListener("change", () => {
+  localStorage.setItem("theme", chk.value);
   document.body.classList.toggle("darkTheme");
 });
-
-const setThemeColor = () => {
-  color = localStorage.getItem("theme");
-  if (color == "on") {
-    document.body.classList.toggle("darkTheme");
-  }
-};
 
 let filterForm = document.getElementById("filterForm");
 let filterSelect = document.getElementById("filterSelect");
@@ -436,9 +428,8 @@ let activeUser = localStorage.getItem("logged");
 function filter() {
   let tasks = localStorage.getItem("todos");
   let pTasks = JSON.parse(tasks);
-  pTasks = pTasks.filter((item) => {
-    return filterSelect.value == item.priority;
-  });
+  pTasks = pTasks.filter((item) => filterSelect.value == item.priority);
+  console.log(pTasks);
   cards[0].innerHTML = "";
   cards[1].innerHTML = "";
   cards[2].innerHTML = "";
