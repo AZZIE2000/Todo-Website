@@ -21,7 +21,7 @@ Finally, our app has a drag and drop feature for the tasks and the user can dele
 | Change theme                | the user can select his preferable theme light or dark              |
 | tracking logged users       | this feature helps user to save his data                            |
 
-- [Jafer Aldakhily](https://github.com/AZZIE2000)
+- [Azzam Faraj](https://github.com/AZZIE2000)
 
 [Visit a live website here.](https://azzie2000.github.io/Todo-Website/)<br>
 [Click here to see wireframe ande mockup](https://www.figma.com/file/BU7Db5UkPcYimCRe6WgdWt/To-Do?node-id=0%3A1)
